@@ -1,0 +1,17 @@
+version: 1
+review:
+  enable: true
+  labels:
+    - "ai-review"
+  on:
+    - pull_request
+    - push
+rules:
+  max_line_length: 120
+  ignore:
+    - "dist/**"
+    - "node_modules/**"
+  suggestions:
+    style: true
+    security: true
+    performance: true
