@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import cookieParser from 'cookie-parser';
 
 import { ENV } from './src/lib/env.js';
 import { connectDB } from './src/lib/db.js';
@@ -13,6 +14,7 @@ const app = express();
 const __dirname = path.resolve();
 
 app.use(express.json()); // req.body
+app.use(cookieParser())
 
 app.use('/api/auth', authRoutes)
 app.use('/api/message', messageRoutes)
