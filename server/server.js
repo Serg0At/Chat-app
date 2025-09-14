@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import cors from 'cors'
 import cookieParser from 'cookie-parser';
 
 import { ENV } from './src/lib/env.js';
@@ -13,8 +14,9 @@ const PORT = ENV.PORT || 3000
 const app = express();
 const __dirname = path.resolve();
 
-app.use(express.json()); // req.body
-app.use(cookieParser())
+app.use(express.json({ limit: '5mb' })); // req.body
+app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
+app.use(cookieParser());
 
 app.use('/api/auth', authRoutes)
 app.use('/api/message', messageRoutes)
