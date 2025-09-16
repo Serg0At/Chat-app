@@ -62,7 +62,7 @@ export default class AuthController {
         }
     }
 
-    static async signin (req, res) {
+    static async login (req, res) {
         const { email, password } = req.body;
 
         try {

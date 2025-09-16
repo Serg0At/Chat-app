@@ -12,7 +12,7 @@ router.get('/test', arcjetProtection, (req,res) => {
 router.use(arcjetProtection);
 
 router.post('/signup', AuthController.signup);
-router.post('/signin', AuthController.signin);
+router.post('/login', AuthController.login);
 router.post('/logout', AuthController.logout);
 
 router.put('/update-profile', AuthMiddleware.protectRoute, AuthController.updateProfile);
