@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcryptjs';
 
 import User from "../models/User.js";
 import { ENV } from '../lib/env.js';
