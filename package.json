@@ -21,8 +21,5 @@
   "bugs": {
     "url": "https://github.com/Serg0At/Chat/issues"
   },
-  "homepage": "https://github.com/Serg0At/Chat#readme",
-  "dependencies": {
-    "@vonage/server-sdk": "^3.25.1"
-  }
+  "homepage": "https://github.com/Serg0At/Chat#readme"
 }
