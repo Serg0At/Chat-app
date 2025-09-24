@@ -5,13 +5,13 @@ import cookieParser from 'cookie-parser';
 
 import { ENV } from './src/lib/env.js';
 import { connectDB } from './src/lib/db.js';
+import { app, server } from './src/lib/socket.js';
 
 import authRoutes from './src/routes/auth.route.js';
 import messageRoutes from './src/routes/message.route.js'
 
 const PORT = ENV.PORT || 3000
 
-const app = express();
 const __dirname = path.resolve();
 
 app.use(express.json({ limit: '5mb' })); // req.body
@@ -30,7 +30,7 @@ if (ENV.NODE_ENV === "production") {
     })
 }
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running on port: ${PORT}`)
     connectDB()
 })
