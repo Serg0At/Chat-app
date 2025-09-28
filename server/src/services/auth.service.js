@@ -4,7 +4,7 @@ import User from '../models/User.js'
 export default class AuthService {
     static async signup (fullName, phone, password) {
 
-        const user = await User.findByPhone({ phone });
+        const user = await User.findByPhone(phone);
         if (user) return res.status(400).json({ message: "User already exists" })
                 
         const salt = await bcrypt.genSalt(10)

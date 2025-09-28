@@ -8,7 +8,7 @@ export default class AuthController {
         const { fullName, phone, password } = req.body;
 
         try {
-            if (!fullName || !email || !password) {
+            if (!fullName || !phone || !password) {
                 return res.status(400).json({ message: "All fields are required"})
             }
 
@@ -16,9 +16,9 @@ export default class AuthController {
                 return res.status(400).JSON({ message: "Password must be at least 6 charachters long"})
             }
 
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                return res.status(400).json({ message: "Invalid email format" });
+            const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+            if (!phoneRegex.test(phone)) {
+                return res.status(400).json({ message: "Invalid phone format" });
             }
 
             return await AuthService.signup(fullName, phone, password);
