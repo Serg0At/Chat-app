@@ -1,6 +1,5 @@
 // NPM Modules
 import knex from 'knex';
-
 // Local Modules
 import knexConfig from '../src/configs/knex.config';
 
@@ -12,12 +11,12 @@ function up(pg) {
                 table.increments('id').primary();
 
                 // User
-                table.boolean('is_verified').defaultTo(false)
+                table.string('account_status').notNullable()
 
                 table.string('username').notNullable().unique();
 
-                table.integer('phone_number').notNullable().unique();
-                table.integer('telegram_id')
+                table.string('phone_number').notNullable().unique();
+                table.string('telegram_id')
 
                 table.string('password').notNullable();
                 table.string('full_name').notNullable();
@@ -28,7 +27,8 @@ function up(pg) {
                 table.string('vfy_secret_from_bot')
                 
                 // Date times and timestamps
-                table.dateTime('vfy_link_secret_expires_at')
+                table.dateTime('vfy_secret_to_expires_at')
+                table.dateTime('vfy_secret_from_expires_at')
                 table.dateTime('last_login_at').defaultTo(pg.fn.now())
 
                 table.timestamp('created_at').defaultTo(pg.fn.now())
@@ -58,7 +58,7 @@ function up(pg) {
                 table.increments("id").primary();
                 table.enu("type", ["direct", "group"]).notNullable(); // direct = 1-to-1, group = group chat
                 table.string("title").nullable(); // The name of a group, if direct left null
-                table.timestamp("created_at").defaultTo(knex.fn.now());
+                table.timestamp("created_at").defaultTo(pg.fn.now());
             })
 
             .createTable("conversation_participants", (table) => {
@@ -78,7 +78,7 @@ function up(pg) {
                   .inTable("users")
                   .onDelete("CASCADE");
                 table.enu("role", ["admin", "member"]).defaultTo("member");
-                table.timestamp("joined_at").defaultTo(knex.fn.now());
+                table.timestamp("joined_at").defaultTo(pg.fn.now());
             })
 
             .createTable("messages", (table) => {
@@ -99,7 +99,7 @@ function up(pg) {
                   .onDelete("CASCADE");
                 table.text("text").nullable();
                 table.string("image").nullable();
-                table.timestamp("created_at").defaultTo(knex.fn.now());
+                table.timestamp("created_at").defaultTo(pg.fn.now());
             })
 
             .createTable("message_reads", (table) => {
@@ -118,10 +118,10 @@ function up(pg) {
                   .references("id")
                   .inTable("users")
                   .onDelete("CASCADE");
-                table.timestamp("read_at").defaultTo(knex.fn.now());
+                table.timestamp("read_at").defaultTo(pg.fn.now());
             })
     )
-}
+};
 
 async function init() {
   try {

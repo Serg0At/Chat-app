@@ -1,29 +1,40 @@
-import { generateToken } from '../lib/utils.js';
-import User from '../models/Auth.js'
+import bcrypt from "bcryptjs";
+import crypto from 'crypto';
+
+import Auth from "../models/Auth.js";
+import generateUsername from "../utils/generateUsername.js";
+
 
 export default class AuthService {
-    static async signup (fullName, phone, password) {
-
-        const user = await User.findByPhone(phone);
-        if (user) return res.status(400).json({ message: "User already exists" })
-                
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password, salt)
-
-        const savedUser = await User.registerUser(fullName, phone, hashedPassword);
-
-        if (savedUser) {
-            const tokens = generateToken(newUser._id, res);
-
-            res.status(201).json({
-                id: savedUser.id,
-                fullName: savedUser.fullName,
-                phone: savedUser.phone_number,
-                profilePic: savedUser.profilePic,
-                accessToken: tokens.accessToken
-            })
-        } else {
-            res.status(400).json({ message: "Invalid user data" });
-        } 
+  static async signup(fullName, phone, password) {
+    const existingUser = await Auth.findByPhone(phone);
+    if (existingUser) {
+      throw new Error("User with that phone number already exists");
     }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    const VfyTokenToBot = crypto.randomBytes(32).toString("hex");
+    const VfyTokenExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+
+    const username = generateUsername(fullName);
+
+    const savedUser = await Auth.registerPendingUser(
+      username,
+      fullName,
+      phone,
+      hashedPassword,
+      VfyTokenToBot,
+      VfyTokenExpiry
+    );
+
+    return {
+      id: savedUser.id,
+      username: savedUser.username,
+      fullName: savedUser.full_name,
+      phone: savedUser.phone_number,
+      vfySecretTo: VfyTokenToBot,
+    };
+  }
 }

@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 
-import cloudinary from '../lib/cloudinary.js';
+// import cloudinary from '../lib/cloudinary.js';
 import AuthService from '../services/auth.service.js';
 
 export default class AuthController {
@@ -21,11 +21,17 @@ export default class AuthController {
                 return res.status(400).json({ message: "Invalid phone format" });
             }
 
-            return await AuthService.signup(fullName, phone, password);
+            const result = await AuthService.signup(fullName, phone, password);
+            
+            if (result) {
+                res.status(200).json(result)
+            } else {
+                res.status(400).json({ message: "Failed to create user" })
+            }
             
         } catch (error) {
             console.log("Error in singup controller", error)
-            res.status(500).json({ message: "Internal server error"})
+            res.status(500).json({ message: "Internal server error" })
         }
     }
 

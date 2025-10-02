@@ -14,7 +14,6 @@ export default {
       database: DATABASE,
       user: USER,
       password: PASSWORD,
-      ssl: { rejectUnauthorized: false },
     },
     pool: {
       min: 2,
@@ -39,7 +38,6 @@ export default {
       database: DATABASE,
       user: USER,
       password: PASSWORD,
-      ssl: { rejectUnauthorized: false },
     },
     pool: {
       min: 2,
