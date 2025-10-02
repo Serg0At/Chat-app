@@ -1,7 +1,7 @@
 // NPM Modules
 import knex from 'knex';
 // Local Modules
-import knexConfigs from '../src/configs/knex.config.js';
+import knexConfig from '../src/configs/knex.config';
 
 function up(pg) {
     return (
