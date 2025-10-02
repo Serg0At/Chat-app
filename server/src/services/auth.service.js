@@ -3,7 +3,7 @@ import User from '../models/Auth.js'
 
 export default class AuthService {
     static async signup (fullName, phone, password) {
-                
+
         const user = await User.findByPhone(phone);
         if (user) return res.status(400).json({ message: "User already exists" })
                 

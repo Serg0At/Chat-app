@@ -1,17 +1,14 @@
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcryptjs';
 
-import User from "../models/User.js";
-import { ENV } from '../lib/env.js';
-import { generateToken } from '../lib/utils.js';
-import { sendWelcomeEmail } from '../emails/emailHandlers.js';
 import cloudinary from '../lib/cloudinary.js';
+import AuthService from '../services/auth.service.js';
 
 export default class AuthController {
     static async signup (req, res) {
-        const { fullName, email, password } = req.body;
+        const { fullName, phone, password } = req.body;
 
         try {
-            if (!fullName || !email || !password) {
+            if (!fullName || !phone || !password) {
                 return res.status(400).json({ message: "All fields are required"})
             }
 
@@ -19,42 +16,12 @@ export default class AuthController {
                 return res.status(400).JSON({ message: "Password must be at least 6 charachters long"})
             }
 
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                return res.status(400).json({ message: "Invalid email format" });
+            const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+            if (!phoneRegex.test(phone)) {
+                return res.status(400).json({ message: "Invalid phone format" });
             }
 
-            const user = await User.findOne({ email });
-            if (user) return res.status(400).json({ message: "User already exists" })
-                
-            const salt = await bcrypt.genSalt(10)
-            const hashedPassword = await bcrypt.hash(password, salt)
-
-            const newUser = new User({
-                fullName,
-                email,
-                password: hashedPassword
-            })
-
-            if (newUser) {
-                generateToken(newUser._id, res);
-                const savedUser = await newUser.save();
-
-                res.status(201).json({
-                    _id: newUser._id,
-                    fullName: newUser.fullName,
-                    email: newUser.email,
-                    profilePic: newUser.profilePic
-                })
-
-                try {
-                    await sendWelcomeEmail(savedUser.email, savedUser.fullName, ENV.CLIENT_URL)
-                } catch (error) {
-                    console.error("Failed to send welcome email:", error); 
-                }
-            } else {
-                res.status(400).json({ message: "Invalid user data" });
-            }
+            return await AuthService.signup(fullName, phone, password);
             
         } catch (error) {
             console.log("Error in singup controller", error)
@@ -62,11 +29,11 @@ export default class AuthController {
         }
     }
 
-    static async signin (req, res) {
+    static async login (req, res) {
         const { email, password } = req.body;
 
         try {
-            const user = User.findOne({ email });
+            const user = await User.findOne({ email });
 
             if (!user ) {
                 return res.status(400).json({ message: "Invalid credentials"})
@@ -110,7 +77,7 @@ export default class AuthController {
                 userId,
                 { profilePic: uploadResponse.secure_url }, 
                 { new: true }
-            );
+            ).select('-password');
 
             res.status(200).json(updatedUser)
         } catch (error) {
