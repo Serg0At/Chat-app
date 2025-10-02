@@ -2,7 +2,7 @@
 import knex from 'knex';
 
 // Local Modules
-import knexConfigs from '../src/configs/knex.config.js';
+import knexConfig from '../src/configs/knex.config';
 
 function up(pg) {
     return (
@@ -122,3 +122,26 @@ function up(pg) {
             })
     )
 }
+
+async function init() {
+  try {
+    const options =
+      process.env.NODE_ENV === 'production'
+        ? knexConfigs.production
+        : knexConfigs.development;
+
+    const pg = knex(options);
+
+    await pg.transaction(async trx => {
+      await up(trx);
+    });
+
+    console.log('✅ Successfully created all tables in transaction');
+    process.exit(0);
+  } catch (error) {
+    console.error('❌ Migration failed:', error.message);
+    process.exit(1);
+  }
+}
+
+init();
