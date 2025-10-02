@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
-import { ENV } from "../lib/env.js";
+import Auth from "../models/Auth.js";
+import config from "../configs/variables.config.js";
 
 export const socketAuthMiddleware = async (socket, next) => {
   try {
@@ -16,14 +16,14 @@ export const socketAuthMiddleware = async (socket, next) => {
     }
 
     // verify the token
-    const decoded = jwt.verify(token, ENV.JWT_SECRET);
+    const decoded = jwt.verify(token, config.AUTH.JWT_ACCESS_SECRET);
     if (!decoded) {
       console.log("Socket connection rejected: Invalid token");
       return next(new Error("Unauthorized - Invalid Token"));
     }
 
     // find the user fromdb
-    const user = await User.findById(decoded.userId).select("-password");
+    const user = await Auth.findById(decoded.userId);
     if (!user) {
       console.log("Socket connection rejected: User not found");
       return next(new Error("User not found"));
@@ -31,9 +31,9 @@ export const socketAuthMiddleware = async (socket, next) => {
 
     // attach user info to socket
     socket.user = user;
-    socket.userId = user._id.toString();
+    socket.userId = user.id.toString();
 
-    console.log(`Socket authenticated for user: ${user.fullName} (${user._id})`);
+    console.log(`Socket authenticated for user: ${user.fullName} (${user.id})`);
 
     next();
   } catch (error) {

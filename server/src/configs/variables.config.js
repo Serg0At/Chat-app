@@ -1,7 +1,13 @@
 import 'dotenv/config';
 
 const config = {
-  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
+  PORT: process.env.PORT,
+  NODE_ENV: process.env.NODE_ENV,
+
+  SERVER: {
+    CLIENT_URL: process.env.CLIENT_URL,
+    BOT_URL: process.env.BOT_URL
+  },
 
   PSQL: {
     PORT: process.env.PSQL_PORT,

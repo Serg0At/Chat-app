@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import config from "../configs/variables.config";
+import config from "../configs/variables.config.js";
 
 const { AUTH } = config
 
