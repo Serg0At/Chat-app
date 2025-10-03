@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import Auth from "../models/Auth.js";
 import generateUsername from "../utils/generateUsername.js";
 
+
 export default class AuthService {
   static async signup(fullName, phone, password) {
     const existingUser = await Auth.findByPhone(phone);
