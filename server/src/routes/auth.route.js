@@ -6,10 +6,12 @@ import AuthMiddleware from '../middleware/auth.middleware.js';
 const router = express.Router();
 
 router.post('/signup', AuthController.signup);
-router.post('/login', AuthController.login);
-router.post('/logout', AuthController.logout);
+router.post('/verify/start', AuthController.verifyTelegram)
 
-router.put('/update-profile', AuthMiddleware.protectRoute, AuthController.updateProfile);
+// router.post('/login', AuthController.login);
+// router.post('/logout', AuthController.logout);
+
+// router.put('/update-profile', AuthMiddleware.protectRoute, AuthController.updateProfile);
 
 router.get("/check", AuthMiddleware.protectRoute, (req, res) => res.status(200).json(req.user));
 

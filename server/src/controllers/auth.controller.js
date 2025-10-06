@@ -35,6 +35,29 @@ export default class AuthController {
         }
     }
 
+    static async verifyTelegram(req, res) {
+        try {
+            const { tokenTo, telegramUserId, telegramPhone } = req.body;
+
+            if (!tokenTo || !telegramPhone || !telegramUserId) {
+                return res.status(400).json({ success: false, message: "Missing required fields" });
+            }
+
+            const result = await AuthService.verifyTelegram(tokenTo, telegramUserId, telegramPhone);
+
+            if (!result.success) {
+                return res.status(400).json(result);
+            }
+
+            return res.status(200).json(result);
+        } catch (error) {
+            console.error("Error verifying Telegram user:", error);
+            return res.status(500).json({ success: false, message: "Server error" });
+        }
+    }
+
+
+
     static async login (req, res) {
         const { email, password } = req.body;
 
