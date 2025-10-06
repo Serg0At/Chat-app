@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "bot": "node ./bot/index.js",
+    "bot": "node bot/index.js",
     "migrate": "node ./migrations/create-tables.js",
     "migrate-down": "node ./migrations/drop-tables.js"
   },
