@@ -38,6 +38,7 @@ export default class AuthController {
     static async verifyTelegram(req, res) {
         try {
             const { tokenTo, telegramUserId, telegramPhone } = req.body;
+            console.log(tokenTo, telegramPhone, telegramUserId)
 
             if (!tokenTo || !telegramPhone || !telegramUserId) {
                 return res.status(400).json({ success: false, message: "Missing required fields" });
@@ -57,6 +58,10 @@ export default class AuthController {
     }
 
 
+    static async verifyToken (req, res) {
+        const { verifingToken } = req.body;
+        
+    }
 
     static async login (req, res) {
         const { email, password } = req.body;

@@ -35,7 +35,7 @@ Backend saves user as pending:
   fullName: "John Doe",
   username: "johndoe",
   phone: "+37499123456",
-  verified: false
+  status: 'pending'
 }
 
 

@@ -4,6 +4,10 @@ import crypto from 'crypto';
 import Auth from "../models/Auth.js";
 import generateUsername from "../utils/generateUsername.js";
 import BotModel from '../models/Bot.js';
+import config from "../configs/variables.config.js";
+
+const { BOT_URL, SERVER_URL } = config.SERVER;
+
 export default class AuthService {
   static async signup(fullName, phone, password) {
     const existingUser = await Auth.findByPhone(phone);
@@ -33,29 +37,30 @@ export default class AuthService {
       username: savedUser.username,
       fullName: savedUser.full_name,
       phone: savedUser.phone_number,
-      vfySecretTo: vfyTokenToBot,
+      vfySecretToBot: vfyTokenToBot,
+      url: `${BOT_URL}?start=${vfyTokenToBot}`
     };
   }
 
    static async verifyTelegram(tokenTo, telegramUserId, telegramPhone) {
-    // Step 1: Check if user exists with this token
+    // Check if user exists with this token
     const user = await BotModel.findTokenToBot(tokenTo);
 
     if (!user) {
       return { success: false, message: "Invalid or expired verification token" };
     }
 
-    // Step 2: Check if phone matches
+    // Check if phone matches
     if (user.phone_number !== telegramPhone) {
       return { success: false, message: "Phone number does not match registered phone" };
     }
 
-    // Step 3: Check if already verified
+    // Check if already verified
     if (user.account_status === "verified") {
       return { success: false, message: "User already verified" };
     }
 
-    // Step 4: Generate final login token for frontend
+    // Generate final login token for frontend
     const vfyTokenFromBot = crypto.randomBytes(32).toString("hex");
     const vfyTokenExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 min expiry
 

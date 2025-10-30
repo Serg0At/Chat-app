@@ -5,6 +5,7 @@ const config = {
   NODE_ENV: process.env.NODE_ENV,
 
   SERVER: {
+    SERVER_URL: process.env.SERVER_URL,
     CLIENT_URL: process.env.CLIENT_URL,
     BOT_URL: process.env.BOT_URL
   },
