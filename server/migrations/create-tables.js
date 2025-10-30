@@ -11,12 +11,12 @@ function up(pg) {
                 table.increments('id').primary();
 
                 // User
-                table.string('account_status').notNullable()
+                table.string('status').notNullable()
 
                 table.string('username').notNullable().unique();
 
                 table.string('phone_number').notNullable().unique();
-                table.string('telegram_id')
+                table.string('telegram_id').unique();
 
                 table.string('password').notNullable();
                 table.string('full_name').notNullable();

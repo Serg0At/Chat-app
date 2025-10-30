@@ -6,7 +6,7 @@ const pg = knex(knexConfig.development);
 export default class BotModel {
   static async findTokenToBot(tokenTo) {
     return await pg("users")
-      .where({ token: tokenTo })
+      .where({ vfy_secret_to_bot: tokenTo })
       .andWhere("vfy_secret_to_expires_at", ">", new Date())
       .first();
   }

@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/signup', AuthController.signup);
 router.post('/verify/start', AuthController.verifyTelegram)
-
+router.post('/verify', AuthController.verifyToken)
 // router.post('/login', AuthController.login);
 // router.post('/logout', AuthController.logout);
 
