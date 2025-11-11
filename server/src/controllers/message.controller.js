@@ -1,10 +1,22 @@
-// import cloudinary from '../lib/cloudinary.js';
+import cloudinary from '../lib/cloudinary.js';
 import { getReceiverSocketId, io } from '../lib/socket.js';
 
 import Message from '../models/Message.js';
-import Auth from '../models/Auth.js';
+import User from '../models/User.js';
 
 export default class MessageController {
+    static async getAllContacts (req, res) {
+        try {
+            const loggedInUserId = req.user._id;
+            const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } })
+            .select('-password');
+
+            res.status(200).json(filteredUsers)
+        } catch (error) {
+            console.log("Error in getAllContacts:", error);
+            res.status(500).json({ message: "Server error" });
+        }
+    }
     
     static async getMessagesByUserId (req, res) {
         try {
@@ -44,7 +56,7 @@ export default class MessageController {
                 )
             ];
 
-            const chatPartners = await Auth.find({ _id: { $in: chatPartnerIds } })
+            const chatPartners = await User.find({ _id: { $in: chatPartnerIds } })
             .select('-password')
             res.status(200).json(chatPartners);
         } catch (error) {
@@ -65,7 +77,7 @@ export default class MessageController {
             if (senderId.equals(receiverId)) {
                 return res.status(400).json({ message: "Cannot send messages to yourself." });
             }
-            const receiverExists = await Auth.exists({ _id: receiverId });
+            const receiverExists = await User.exists({ _id: receiverId });
             if (!receiverExists) {
                 return res.status(404).json({ message: "Receiver not found." });
             }
