@@ -1,6 +1,29 @@
-import knex from 'knex';
-import knexConfig from '../configs/knex.config.js';
+import mongoose from "mongoose";
 
-const pg = knex(knexConfig.development);
+const messageSchema = new mongoose.Schema(
+  {
+    senderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    receiverId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    text: {
+      type: String,
+      trim: true,
+      maxlength: 2000,
+    },
+    image: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
-export default class MessageModel {}
+const Message = mongoose.model("Message", messageSchema);
+
+export default Message;

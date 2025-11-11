@@ -1,14 +1,17 @@
 import bcrypt from 'bcryptjs';
 
-// import cloudinary from '../lib/cloudinary.js';
-import AuthService from '../services/auth.service.js';
+import User from "../models/User.js";
+import { ENV } from '../lib/env.js';
+import { generateToken } from '../lib/utils.js';
+import { sendWelcomeEmail } from '../emails/emailHandlers.js';
+import cloudinary from '../lib/cloudinary.js';
 
 export default class AuthController {
     static async signup (req, res) {
-        const { fullName, phone, password } = req.body;
+        const { fullName, email, password } = req.body;
 
         try {
-            if (!fullName || !phone || !password) {
+            if (!fullName || !email || !password) {
                 return res.status(400).json({ message: "All fields are required"})
             }
 
@@ -16,51 +19,47 @@ export default class AuthController {
                 return res.status(400).JSON({ message: "Password must be at least 6 charachters long"})
             }
 
-            const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-            if (!phoneRegex.test(phone)) {
-                return res.status(400).json({ message: "Invalid phone format" });
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                return res.status(400).json({ message: "Invalid email format" });
             }
 
-            const result = await AuthService.signup(fullName, phone, password);
-            
-            if (result) {
-                res.status(200).json(result)
+            const user = await User.findOne({ email });
+            if (user) return res.status(400).json({ message: "User already exists" })
+                
+            const salt = await bcrypt.genSalt(10)
+            const hashedPassword = await bcrypt.hash(password, salt)
+
+            const newUser = new User({
+                fullName,
+                email,
+                password: hashedPassword
+            })
+
+            if (newUser) {
+                generateToken(newUser._id, res);
+                const savedUser = await newUser.save();
+
+                res.status(201).json({
+                    _id: newUser._id,
+                    fullName: newUser.fullName,
+                    email: newUser.email,
+                    profilePic: newUser.profilePic
+                })
+
+                try {
+                    await sendWelcomeEmail(savedUser.email, savedUser.fullName, ENV.CLIENT_URL)
+                } catch (error) {
+                    console.error("Failed to send welcome email:", error); 
+                }
             } else {
-                res.status(400).json({ message: "Failed to create user" })
+                res.status(400).json({ message: "Invalid user data" });
             }
             
         } catch (error) {
             console.log("Error in singup controller", error)
-            res.status(500).json({ message: "Internal server error" })
+            res.status(500).json({ message: "Internal server error"})
         }
-    }
-
-    static async verifyTelegram(req, res) {
-        try {
-            const { tokenTo, telegramUserId, telegramPhone } = req.body;
-            console.log(tokenTo, telegramPhone, telegramUserId)
-
-            if (!tokenTo || !telegramPhone || !telegramUserId) {
-                return res.status(400).json({ success: false, message: "Missing required fields" });
-            }
-
-            const result = await AuthService.verifyTelegram(tokenTo, telegramUserId, telegramPhone);
-
-            if (!result.success) {
-                return res.status(400).json(result);
-            }
-
-            return res.status(200).json(result);
-        } catch (error) {
-            console.error("Error verifying Telegram user:", error);
-            return res.status(500).json({ success: false, message: "Server error" });
-        }
-    }
-
-
-    static async verifyToken (req, res) {
-        const { verifingToken } = req.body;
-        
     }
 
     static async login (req, res) {
